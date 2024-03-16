@@ -1,6 +1,7 @@
 mod components;
 mod map;
 mod player;
+mod rect;
 
 use components::{Player, Position, Renderable};
 use map::{draw_map, TileType};
@@ -8,7 +9,7 @@ use player::player_input;
 use rltk::{GameState, Rltk, RGB};
 use specs::prelude::*;
 
-use crate::map::new_map;
+use crate::map::{new_map_test, new_map_rooms_and_corridors};
 
 struct State {
     ecs: World,
@@ -49,7 +50,8 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
 
-    gs.ecs.insert(new_map());
+    // gs.ecs.insert(new_map_test());
+    gs.ecs.insert(new_map_rooms_and_corridors());
 
     gs.ecs
         .create_entity()
