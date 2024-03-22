@@ -1,9 +1,9 @@
 mod components;
 mod map;
+mod monster_ai_system;
 mod player;
 mod rect;
 mod visibility_system;
-mod monster_ai_system;
 
 use components::{Player, Position, Renderable};
 use map::draw_map;
@@ -13,18 +13,32 @@ use rltk::{GameState, Rltk, RGB};
 use specs::prelude::*;
 use visibility_system::VisibilitySystem;
 
-use crate::{components::{Viewshed, Monster}, map::Map};
+use crate::{
+    components::{Monster, Viewshed},
+    map::Map,
+};
+
+#[derive(PartialEq, Copy, Clone)]
+pub enum RunState {
+    Paused,
+    Running,
+}
 
 struct State {
-    ecs: World,
+    pub ecs: World,
+    pub run_state: RunState,
 }
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut Rltk) {
         ctx.cls();
 
-        self.run_systems();
-        player_input(self, ctx);
+        if self.run_state == RunState::Running {
+            self.run_systems();
+            self.run_state = RunState::Paused;
+        } else {
+            self.run_state = player_input(self, ctx);
+        }
 
         draw_map(&self.ecs, ctx);
 
@@ -45,7 +59,7 @@ impl State {
     fn run_systems(&mut self) {
         let mut vis = VisibilitySystem {};
         vis.run_now(&self.ecs);
-        let mut mob = MonsterAI{};
+        let mut mob = MonsterAI {};
         mob.run_now(&self.ecs);
         self.ecs.maintain();
     }
@@ -56,7 +70,10 @@ fn main() -> rltk::BError {
     let context = RltkBuilder::simple80x50()
         .with_title("Roguelike Tutorial")
         .build()?;
-    let mut gs = State { ecs: World::new() };
+    let mut gs = State {
+        ecs: World::new(),
+        run_state: RunState::Running,
+    };
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();

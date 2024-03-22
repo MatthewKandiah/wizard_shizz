@@ -153,10 +153,16 @@ pub fn draw_map(ecs: &World, ctx: &mut Rltk) {
                         background_colour,
                         rltk::to_cp437('#'),
                     );
-                },
+                }
                 TileType::Floor => {
-                    ctx.set(x, y, non_visible_colour, background_colour, rltk::to_cp437('.'));
-                },
+                    ctx.set(
+                        x,
+                        y,
+                        non_visible_colour,
+                        background_colour,
+                        rltk::to_cp437('.'),
+                    );
+                }
             }
         }
 
