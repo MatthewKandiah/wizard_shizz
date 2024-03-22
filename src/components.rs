@@ -25,3 +25,5 @@ pub struct Viewshed {
     pub dirty: bool,
 }
 
+#[derive(Component, Debug)]
+pub struct Monster {}
