@@ -9,7 +9,7 @@ use components::{Player, Position, Renderable};
 use map::draw_map;
 use monster_ai_system::MonsterAI;
 use player::player_input;
-use rltk::{GameState, Rltk, RGB};
+use rltk::{GameState, Point, Rltk, RGB};
 use specs::prelude::*;
 use visibility_system::VisibilitySystem;
 
@@ -122,5 +122,6 @@ fn main() -> rltk::BError {
     }
 
     gs.ecs.insert(map);
+    gs.ecs.insert(Point::new(player_x, player_y));
     rltk::main_loop(context, gs)
 }

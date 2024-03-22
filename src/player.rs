@@ -1,6 +1,7 @@
 use std::cmp::max;
 use std::cmp::min;
 
+use rltk::Point;
 use rltk::Rltk;
 use rltk::VirtualKeyCode;
 use specs::prelude::*;
@@ -27,6 +28,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
             pos.y = min(49, max(0, pos.y + delta_y));
 
             viewshed.dirty = true;
+            let mut ppos = ecs.write_resource::<Point>();
+            ppos.x = pos.x;
+            ppos.y = pos.y;
         }
     }
 }
