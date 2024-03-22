@@ -14,7 +14,7 @@ use specs::prelude::*;
 use visibility_system::VisibilitySystem;
 
 use crate::{
-    components::{Monster, Viewshed},
+    components::{Monster, Viewshed, Name},
     map::Map,
 };
 
@@ -79,6 +79,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Player>();
     gs.ecs.register::<Viewshed>();
     gs.ecs.register::<Monster>();
+    gs.ecs.register::<Name>();
 
     let map = Map::new_map_rooms_and_corridors();
     let (player_x, player_y) = map.rooms[0].center();
@@ -86,6 +87,7 @@ fn main() -> rltk::BError {
     gs.ecs
         .create_entity()
         .with(Player {})
+        .with(Name {name: "Player".to_string()})
         .with(Position {
             x: player_x,
             y: player_y,
@@ -102,14 +104,27 @@ fn main() -> rltk::BError {
         })
         .build();
 
-    for room in map.rooms.iter().skip(1) {
+    for (i, room) in map.rooms.iter().skip(1).enumerate() {
         let (x, y) = room.center();
+
+        let glyph: rltk::FontCharType;
+        let name: String;
+        let mut rng = rltk::RandomNumberGenerator::new();
+        let roll = rng.roll_dice(1,2);
+        if roll == 1 {
+            glyph = rltk::to_cp437('g');
+            name = "Goblin".to_string();
+        } else {
+            glyph = rltk::to_cp437('o');
+            name = "Orc".to_string();
+        }
+
         gs.ecs
             .create_entity()
             .with(Monster {})
             .with(Position { x, y })
             .with(Renderable {
-                glyph: rltk::to_cp437('g'),
+                glyph,
                 fg: RGB::named(rltk::RED),
                 bg: RGB::named(rltk::BLACK),
             })
@@ -118,6 +133,7 @@ fn main() -> rltk::BError {
                 range: 8,
                 dirty: true,
             })
+            .with(Name { name: format!("{} #{}", &name, i) })
             .build();
     }
 
